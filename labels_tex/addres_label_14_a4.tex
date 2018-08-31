@@ -1,0 +1,81 @@
+	\documentclass[12pt,a4paper]{article}
+%\documentclass{scrbook}
+\usepackage{nopageno}
+\usepackage[twocolumn,textwidth=19cm,columnsep=.5cm]{geometry}
+\usepackage{amsfonts, amsmath, amssymb, amsthm}
+\usepackage{datatool}
+\usepackage{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{marvosym}
+\usepackage{hyperref}
+\usepackage{booktabs, multicol, multirow, longtable}
+\usepackage{titlesec, enumitem, fullpage}
+\usepackage{xspace}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+
+\geometry{
+ a4paper,
+ total={200mm,257mm},
+ left=0mm,
+ top=20mm,
+ bottom=0mm
+}
+\setlength\columnsep{0mm}
+
+\def\basiceval#1{\the\numexpr#1\relax}
+
+\newcounter{TableCount}
+
+\titleformat*{\section}{\large\bfseries}
+\titleformat*{\subsection}{\bfseries}
+
+\setlength\parindent{0pt}
+\setlength\parskip{4pt}
+\setlist[itemize]{itemsep=-4pt}
+
+%\titlespacing{\section}{1pt}{*0}{*0}
+%\titlespacing{\subsection}{1pt}{*0}{*0}
+\titlespacing{\subsubsection}{1pt}{*0}{*0}
+
+\date{}
+
+\begin{document}
+
+	\DTLloadrawdb{addresses}{../NEW_ORDER.csv}
+
+
+\DTLforeach{addresses}{
+\deliveryCompanyName =Delivery Company Name,	
+\deliveryName =Delivery Name,
+\deliveryAddressOne =Delivery Address Line 1,
+\deliveryAddressTwo =Delivery Address Line 2,
+\deliveryAddressThree =Delivery Address Line 3,
+\deliveryCity =Delivery Town/City,
+\deliveryState =Delivery State/County,
+\deliveryPostcode =Delivery Postcode,
+\deliveryCountry =Delivery Country}
+{
+	\ifdefempty{\deliveryName}{}{
+	\hspace{1.0cm}
+	\begin{minipage}[t][3.8cm][t]{0.9\columnwidth}
+		\deliveryName\\
+		\ifdefempty{\deliveryCompanyName}{}{
+			\ifx
+				\deliveryName\deliveryCompanyName
+			\else
+				\deliveryCompanyName\\
+			\fi	
+		}
+		\ifdefempty{\deliveryAddressOne}{}{\deliveryAddressOne}\ifdefempty{\deliveryAddressTwo}{\\}{, 							\deliveryAddressTwo\\}
+		\ifdefempty{\deliveryAddressThree}{}{\deliveryAddressThree\\}
+		\deliveryCity\ifdefempty{\deliveryState}{,}{, \deliveryState} \deliveryPostcode\\
+		\deliveryCountry\\
+
+	\end{minipage}
+	}
+}
+
+
+\end{document}

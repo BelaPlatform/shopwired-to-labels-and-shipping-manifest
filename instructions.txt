@@ -1,0 +1,13 @@
+a. Export orders .csv and copy it to the same folder the script lives on.
+
+c. Run the shell script passing the export as the 1st parameter:		
+	sh build_orders.sh <order_export.csv>
+
+d. There should the script should have generated several files:
+	d.1 `MANIFEST.csv` - csv file to use with Royal Mail's drop n go.
+	d.2 `NEW_ORDER.csv` - csv file used by the latex script to generate the labels
+	d.3 `items_to_ship.txt` - txt file indicating a summary of the items that are being shipped extracted from all orders
+	d.4 `order_info.txt`- txt file with a summary of the orders including order ID, address & comments.
+	d.4 `addres_label_14_a4.pdf` contains the pdf labels
+
+d. Upload the `MANIFEST.csv file to https://www.postoffice.co.uk/dropandgo and generate the manifest. If you see something weird on the pdf that this page renders, you can edit it manually after uploading the csv. You can also edit the csv in this case, but I found the post office's page does some unpredictable stuff so it is better to edit it there.

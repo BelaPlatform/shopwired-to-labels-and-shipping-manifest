@@ -21,5 +21,5 @@ NOTE: This scripts have been tailored for the different items on [our shop](http
   * `order_info.txt`- txt file with a summary of the orders including order ID, address & comments.
   * `addres_label_14_a4.pdf` contains the pdf labels
 
-4. Upload the `MANIFEST.csv file to https://www.postoffice.co.uk/dropandgo to generate the manifest. 
+4. Upload the `MANIFEST.csv` file to https://www.postoffice.co.uk/dropandgo to generate the manifest. 
 If there is something odd on the pdf that this page renders, you can edit it manually after uploading the csv. You can also edit the csv before uploading, but I found the post office's page does some unpredictable stuff so it is better to edit it there.

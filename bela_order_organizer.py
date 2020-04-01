@@ -45,18 +45,7 @@ shipping_methods_translate_World = {
 }
 
 items_dictionary = {
-    'extra Audio Adapter Cable': 'Audio Adapter Cables',
-    'extra Audio Adapter Cables': 'Audio Adapter Cables',
-    'extra audio adapter cables': 'Audio Adapter Cables',
     '16GB SD card flashed with Bela software': '16GB Flashed SD Card',
-    'Bela Cape - PREORDER, shipping July 2018': 'Bela Cape',
-    'Bela Starter Kit - PREORDER, shipping July 2018': 'Bela Starter Kit',
-    'CTAG BEAST cape: PREORDER, SHIPPING AUGUST 2018': 'CTAG BEAST cape',
-    'CTAG FACE cape: PREORDER, SHIPPING AUGUST 2018': 'CTAG FACE cape',
-    'CTAG BEAST starter kit: PREORDER, SHIPPING AUGUST 2018': 'CTAG BEAST starter kit',
-    'CTAG FACE starter kit: PREORDER, SHIPPING AUGUST 2018': 'CTAG FACE starter kit',
-    'Bela Mini Cape - PREORDER, SHIPPING MAY 2018': 'Bela Mini Cape',
-    'Bela Mini Starter Kit - PREORDER, SHIPPING MAY 2018': 'Bela Mini   Starter Kit',
 }
 
 EU_country_codes = [
@@ -70,11 +59,11 @@ class Item():
         self.name = name
         self.quantity = quantity
         self.sku = sku
-        
-        
+
+
     def update_quantity(self, value):
         self.quantity += value
-    
+
 class Order():
     def __init__(self, order_id, shipping_method, shipping_address, value, items=None, extras=None, comments=None):
         self.order_id = order_id
@@ -84,12 +73,12 @@ class Order():
         self.items = items or []
         self.extras = extras or []
         self.comments = comments or ''
-        
+
     # Decode and Print Address Method
     # (it assumes that the address elements are in the same order every time!!!)
     def print_address(self):
         address_string = ''
-        
+
         for i, address_element in enumerate(self.shipping_address):
             if i == 0:
                 address_string = address_string + address_element + '\n'
@@ -103,8 +92,8 @@ class Order():
                 address_string = address_string + address_element + '\n'
             elif i in (5, 6) and address_element:
                     address_string = address_string + address_element + ", "
-        print address_string
-        
+        print(address_string)
+
     # Update shipping method based on country of origin
     def update_shipping_method(self):
         country_code = self.shipping_address[-1]
@@ -124,18 +113,18 @@ class Order():
             elif method in shipping_methods_translate_World:
                 self.shipping_method = shipping_methods_translate_World[method]
 
-        print self.shipping_method
-                
+        print(self.shipping_method)
+
     def add_item(self, name, quantity, sku=None):
-        filtered_items = [x for x in self.items if x.name == name] 
-        
+        filtered_items = [x for x in self.items if x.name == name]
+
         if not filtered_items:
             self.items.append(Item(name, quantity, sku))
         else:
             filtered_items[0].update_quantity(quantity)
-    
+
     def add_extras(self, name, quantity, sku=None):
-        filtered_extras = [x for x in self.extras if x.name == name] 
+        filtered_extras = [x for x in self.extras if x.name == name]
         if not filtered_extras:
             self.extras.append(Item(name, quantity, sku))
         else:
@@ -146,11 +135,22 @@ class Order():
             item_string = str(i.quantity) + ' ' + i.name
             if i.sku:
                 item_string = item_string + ' ('+i.sku+')'
-            print item_string
-            
-    
-    
-    
+            print(item_string)
+
+
+class Address():
+    def __init__(self, name, company, address1, address2, city, province, zipcode, country, t='shipping'):
+        self.name = name
+        self.company = company
+        self.address1 = address1
+        self.address2 = address2
+        self.city = city
+        self.province = province
+        self.zipcode = zipcode
+        self.country = country
+        self.t = t
+
+
 # Parse extras string into different items
 def parse_extras(extras):
     extras_list = extras.split(',')
@@ -166,159 +166,157 @@ def parse_extras(extras):
             else:
                 extra_num = 1
                 extra_name = extra_info[0].lstrip().rstrip()
-            parsed_extras.append([extra_name, extra_num])  
+            parsed_extras.append([extra_name, extra_num])
     return parsed_extras
-    
-    
-items = []
+
+
 orders = []
-
-
+items = []
 
 # Read input file
-with open(input_file_name, 'rb') as in_file:
+with open(input_file_name, 'r') as in_file:
     # Declar csv reader
     reader = csv.reader(in_file)
     # Extract header
     header = next(reader)
-    
-    #print header
-    
-    id_index = header.index('Order ID')
-    ship_method_index = header.index('Delivery Method')
-    val_index = header.index('Grand Total')
+
+#     print(header)
+
+
+    id_index = header.index('Name')
+    ship_method_index = header.index('Shipping Method')
+    val_index = header.index('Total')
 
     address_indices = [
-        header.index('Delivery Name'),
-        header.index('Delivery Company Name'),
-        header.index('Delivery Address Line 1'),
-        header.index('Delivery Address Line 2'),
-        header.index('Delivery Address Line 3'),
-        header.index('Delivery Town/City'),
-        header.index('Delivery State/County'),
-        header.index('Delivery Postcode'),
-        header.index('Delivery Country'),
-        header.index('Delivery Country Code')
+        header.index('Shipping Name'),
+        header.index('Shipping Company'),
+        header.index('Shipping Address1'),
+        header.index('Shipping Address2'),
+        header.index('Shipping City'),
+        header.index('Shipping Province'),
+        header.index('Shipping Zip'),
+        header.index('Shipping Country'),
     ]
-    
-    SKU_index = header.index('Item SKU')
-    item_index = header.index('Item Name')
-    num_index = header.index('Item Quantity')
-    extras_index = header.index('Product Extras')
-    
-    comments_index = header.index('Comments')
 
-    
+    SKU_index = header.index('Lineitem sku')
+    item_index = header.index('Lineitem name')
+    num_index = header.index('Lineitem quantity')
+#     extras_index = header.index('Product Extras')
+
+    comments_index = header.index('Notes')
+
+
     for row in reader:
-        
+
         ## Create new item
         new_item_name = row[item_index]
         if new_item_name in items_dictionary:
             new_item_name = items_dictionary[new_item_name]
-            
+
         num_items = int(row[num_index])
         new_item = Item(new_item_name, num_items, row[SKU_index])
-        
-        filtered_items = [x for x in items if x.name == new_item.name] 
-        
+
+        filtered_items = [x for x in items if x.name == new_item.name]
+
         if not filtered_items:
             items.append(new_item)
         else:
             filtered_items[0].update_quantity(new_item.quantity)
-            
-        ## Parse extras
-        parsed_extras = parse_extras(row[extras_index])
-        new_extras = []
-        if parsed_extras:
-            for pe in parsed_extras:
-                new_extra_name = pe[0]
-                if new_extra_name in items_dictionary:
-                    new_extra_name = items_dictionary[new_extra_name]
-                new_extra = Item(new_extra_name, num_items * int(pe[1]))
-        
-                filtered_items = [x for x in items if x.name == new_extra_name] 
-                filtered_extras = [x for x in new_extras if x.name == new_extra_name] 
 
-                if not filtered_items:
-                    items.append(copy.deepcopy(new_extra))
-                else:
-                    filtered_items[0].update_quantity(new_extra.quantity)
-                new_extras.append(new_extra)
+#         ## Parse extras
+#         parsed_extras = parse_extras(row[extras_index])
+#         new_extras = []
+#         if parsed_extras:
+#             for pe in parsed_extras:
+#                 new_extra_name = pe[0]
+#                 if new_extra_name in items_dictionary:
+#                     new_extra_name = items_dictionary[new_extra_name]
+#                 new_extra = Item(new_extra_name, num_items * int(pe[1]))
+
+#                 filtered_items = [x for x in items if x.name == new_extra_name]
+#                 filtered_extras = [x for x in new_extras if x.name == new_extra_name]
+
+#                 if not filtered_items:
+#                     items.append(copy.deepcopy(new_extra))
+#                 else:
+#                     filtered_items[0].update_quantity(new_extra.quantity)
+#                 new_extras.append(new_extra)
 
 
-        ## Filter orders   
-        filtered_orders = [x for x in orders if x.order_id == row[id_index]] 
+        ## Filter orders
+        filtered_orders = [x for x in orders if x.order_id == row[id_index]]
         # Alternatively:
             # filtered_orders = filter(lambda x: x.order_id == row[id_index],  orders)
-        
+
         current_order = None
         if not filtered_orders:
             # Compose Address
             full_address = []
             for i in address_indices:
                 full_address.append(row[i])
-                
+
             current_order = Order (
-                row[id_index], 
-                row[ship_method_index], 
-                full_address, 
+                row[id_index],
+                row[ship_method_index],
+                full_address,
                 row[val_index],
                 None,
-                None, 
+                None,
                 row[comments_index]
-            )            
+            )
             orders.append(current_order)
         else:
             current_order = filtered_orders[0].order_id
         orders[-1].add_item(new_item.name, new_item.quantity, new_item.sku)
-        for ne in new_extras:
-            orders[-1].add_extras(ne.name, ne.quantity)
-            
-            
-    sys.stdout = open('items_to_ship.txt', 'wb')
+#         for ne in new_extras:
+#             orders[-1].add_extras(ne.name, ne.quantity)
+
+#   stdoutput = sys.stdout
+    sys.stdout = open('items_to_ship.txt', 'w')
     for i in items:
-        print '\n....................\n'
-        print str(i.quantity)+' '+i.name
-    
-    sys.stdout = open('order_info.txt', 'wb')
-    for o in orders:  
-        print '\n--------------------\n'
-        print o.order_id + '\n'
+        print('\n....................\n')
+        print(str(i.quantity)+' '+i.name)
+
+    sys.stdout = open('order_info.txt', 'w')
+    for o in orders:
+        print('\n--------------------\n')
+        print(o.order_id + '\n')
         o.print_address()
         o.update_shipping_method()
-        print '\n'
+        print('\n')
         o.print_items()
-        if o.comments: 
-            print '\n'
-            print o.comments
-    
+        if o.comments:
+            print('\n')
+            print(o.comments)
+#    sys.stdout = stdoutput
     sys.stdout = sys.__stdout__
-        
+
+
 ##WRITTING BACK TO CSV
 # Manifest csv
-manifest_header = ['Item ', 'Shipping Service', 'Ship to Zip', 'Ship To Address 1', 'Sale Price', 'Currency']
-#manifest_header = ['Item ', 'Shipping Service', 'Ship to Zip', 'Ship To Address 1', 'Sale Price', 'Currency']
+manifest_header = ['Item ', 'Country', 'Shipping Service', 'Ship to Zip', 'Ship To Address 1', 'Sale Price', 'Currency']
 manifest_data = []
 for o in orders:
     if o.shipping_method is not 'DHL':
         order_data = []
         order_data.append(o.order_id)
+        order_data.append(o.shipping_address[-1])
         order_data.append(o.shipping_method)
-        order_data.append(o.shipping_address[7])
+        order_data.append(o.shipping_address[-2])
         order_data.append(o.shipping_address[2])
         order_data.append('£'+ str(int(round(float(o.value)))))
         order_data.append('GBP')
 
         manifest_data.append(order_data)
-    
-with open('MANIFEST.csv', 'wb') as manifest_file:
+
+with open('MANIFEST.csv', 'w') as manifest_file:
     writer = csv.writer(manifest_file)
     # Print header
     writer.writerow(manifest_header)
     # Print data
-    writer.writerows(manifest_data)        
+    writer.writerows(manifest_data)
 
-# Labels csv  
+# Labels csv
 labels_header = [
     'Delivery Name', 'Delivery Company Name', 'Delivery Address Line 1',
     'Delivery Address Line 2', 'Delivery Address Line 3', 'Delivery Town/City',
@@ -329,10 +327,11 @@ for o in orders:
     order_data = []
     for shipping_data in o.shipping_address[:-1]:
         order_data.append(shipping_data)
-    
+    order_data.insert(4, '') #insert empty string for Delivery Address Line 3
+
     labels_data.append(order_data)
 
-with open('NEW_ORDER.csv', 'wb') as labels_file:
+with open('NEW_ORDER.csv', 'w') as labels_file:
     writer = csv.writer(labels_file)
     # Print header
     writer.writerow(labels_header)

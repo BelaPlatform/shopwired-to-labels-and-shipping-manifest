@@ -325,7 +325,7 @@ labels_header = [
 labels_data = []
 for o in orders:
     order_data = []
-    for shipping_data in o.shipping_address[:-1]:
+    for shipping_data in o.shipping_address:
         order_data.append(shipping_data)
     order_data.insert(4, '') #insert empty string for Delivery Address Line 3
 

@@ -10,17 +10,17 @@ input_file_name = ''
 try:
     opts, args = getopt.getopt(sys.argv[1:],"hf:")
 except getopt.GetoptError:
-    print 'bela_order_organizer.py -f <inputfile>'
+    print('bela_order_organizer.py -f <inputfile>')
     sys.exit(2)
 for opt, arg in opts:
     if opt == '-h':
-        print 'bela_order_organizer.py -f <inputfile>'
+        print('bela_order_organizer.py -f <inputfile>')
         sys.exit()
     elif opt == '-f':
         input_file_name = arg
         print(input_file_name)
         if not os.path.exists(input_file_name):
-            print 'Filepath does not exist'
+            print('Filepath does not exist')
             sys.exit()
 
 print("File to be processed: %s " % input_file_name)
